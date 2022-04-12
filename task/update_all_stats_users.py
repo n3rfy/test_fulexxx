@@ -14,15 +14,14 @@ engine = sa.create_engine(
 )
 
 async def main():
+    """Task update stats all users in database"""
+
     github = GitHub(engine)
-    login_users = github.get_all_login_users()
-    for login in login_users:
-         print(await github.get_stats_user_by_login(login))
+    users = github.get_all_login_users()
+    for id_user, login in users.items():
+        all_stats_rep = await github.get_stats_user_by_login(id_user, login)
+        for stats_rep in all_stats_rep:
+            github.push_stats_users_in_database(stats_rep)
 
 if __name__ == "__main__":
-    try:
-        asyncio.run(
-            main()
-        )
-    except KeyboardInterrupt:
-        pass
+    asyncio.run(main())
