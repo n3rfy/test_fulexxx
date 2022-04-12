@@ -14,12 +14,20 @@ class UserAddRequestV1(BaseModel):
     name: str
 
 class StatsResponseV1(BaseModel):
-    user_id: int 
     repo_id: int
-    date: datetime
+    date: str 
     stargazers: int
     forks: int 
     watchers: int 
+
+class StatsAddV1(BaseModel):
+    user_id: int
+    repo_id: int
+    date: datetime 
+    stargazers: int
+    forks: int 
+    watchers: int 
+
 
 class UserStatsResponseV1(BaseModel):
     user: UserResponseV1
