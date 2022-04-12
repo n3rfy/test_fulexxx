@@ -1,6 +1,11 @@
 from typing import List
 
-from src.user.models import UserResponseV1, UserAddRequestV1
+from src.user.models import (
+    UserResponseV1, 
+    UserAddRequestV1, 
+    UserStatsResponseV1,
+)
+
 
 
 class UserServiceProtocol:
@@ -8,6 +13,9 @@ class UserServiceProtocol:
         raise NotImplementedError
 
     def get_user_by_id(self, id: int) -> UserResponseV1:
+        raise NotImplementedError
+
+    def get_stat_user_by_id(self, id: int) -> UserStatsResponseV1:
         raise NotImplementedError
 
     def add_user(self, user: UserAddRequestV1) -> None:

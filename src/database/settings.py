@@ -7,3 +7,7 @@ class DatabaseSettings(BaseSettings):
     username: str = Field(..., env='DB_USERNAME')
     password: str = Field(..., env='DB_PASSWORD')
     database: str = Field(..., env='DB_DATABASE')
+
+    class Config:
+        env_file = '.env'
+        env_file_encoding = 'utf-8'
