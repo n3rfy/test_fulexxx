@@ -3,12 +3,14 @@ from typing import List
 
 from sqlalchemy import select, insert, delete
 from sqlalchemy.future import Engine
+from fastapi import HTTPException
 
 from src.database import tables
 from src.user.models import (
     UserResponseV1, 
     UserAddRequestV1,
     UserStatsResponseV1,
+    StatsResponseV1,
 )
 
 
@@ -57,7 +59,7 @@ class UserService:
             connection.execute(query)
             connection.commit()
 
-    def get_user_stats_by_id(
+    def get_stats_user_by_id(
         self,
         id: int,
         date_from: datetime, 
@@ -65,16 +67,25 @@ class UserService:
     ) -> UserStatsResponseV1:
         query = select(
                     tables.users,
-                    tables.stats
+                    tables.stats,
+                ).select_from(
+                    tables.users.join(tables.stats)
                 ).where(
-                    tables.users.c.id == id
+                    tables.users.c.id == id and 
+                    date_from < tables.stats.c.date < date_to
                 )
         with self._engine.connect() as connection:
             user_data = connection.execute(query)
-        print(user_data)
-        user = UserResponseV1(
-            id=user_data['id'],
-            login=user_data['login'],
-            name=user_data['name']
-            )
-
+        user_data = [ dict(user) for user in user_data ]
+        if not user_data:
+            raise HTTPException(status_code=404, detail="Item not found")
+        return UserStatsResponseV1(
+            user=UserResponseV1(**user_data[0]),
+            stats=[ 
+                        StatsResponseV1(
+                            date = str(stats.pop('date')),
+                            **stats
+                        ) for stats in user_data 
+                  ],
+        )
+    

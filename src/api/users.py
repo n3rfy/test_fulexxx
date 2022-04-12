@@ -65,7 +65,7 @@ def delete_user(
     user_service.delete_user_by_id(id)
 
 @router.get(
-    path='v1/users/{id}/stats',
+    path='/v1/users/{id}/stats',
     summary='Статистика пользователя за указанный период', 
     description='Статистика пользователя за указанный период',
 )
@@ -75,4 +75,4 @@ def get_user_stats(
     date_to: datetime = datetime.now(),
     user_service: UserServiceProtocol = Depends(),
 ) -> UserStatsResponseV1:
-    pass
+    return user_service.get_stats_user_by_id(id, date_from, date_to)
