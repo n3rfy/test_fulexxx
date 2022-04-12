@@ -1,9 +1,14 @@
 from typing import List
+from datetime import datetime, timedelta
 
 from fastapi import APIRouter, status, Depends, Path
 
 from src.api.protocols import UserServiceProtocol
-from src.user.models import UserResponseV1, UserAddRequestV1
+from src.user.models import (
+    UserResponseV1,
+    UserAddRequestV1,
+    UserStatsResponseV1,
+)
 
 router = APIRouter(
     tags=['Users']
@@ -58,3 +63,16 @@ def delete_user(
         user_service: UserServiceProtocol = Depends()
 ):
     user_service.delete_user_by_id(id)
+
+@router.get(
+    path='v1/users/{id}/stats',
+    summary='Статистика пользователя за указанный период', 
+    description='Статистика пользователя за указанный период',
+)
+def get_user_stats(
+    id: int = Path(..., ge=1),
+    date_from: datetime = datetime.now() - timedelta(days=1),
+    date_to: datetime = datetime.now(),
+    user_service: UserServiceProtocol = Depends(),
+) -> UserStatsResponseV1:
+    pass
