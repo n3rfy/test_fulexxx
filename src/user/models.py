@@ -14,6 +14,7 @@ class UserAddRequestV1(BaseModel):
     name: str
 
 class StatsResponseV1(BaseModel):
+    user_id: int 
     repo_id: int
     date: datetime
     stargazers: int
