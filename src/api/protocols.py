@@ -1,4 +1,5 @@
 from typing import List
+from datetime import datetime
 
 from src.user.models import (
     UserResponseV1, 
@@ -15,11 +16,16 @@ class UserServiceProtocol:
     def get_user_by_id(self, id: int) -> UserResponseV1:
         raise NotImplementedError
 
-    def get_stats_user_by_id(self, id: int) -> UserStatsResponseV1:
+    def delete_user_by_id(self, id: int) -> None:
         raise NotImplementedError
 
     def add_user(self, user: UserAddRequestV1) -> None:
         raise NotImplementedError
 
-    def delete_user_by_id(self, id: int) -> None:
+    def get_stats_user_by_id(
+            self,
+            id: int,
+            date_from: datetime,
+            date_to: datetime,
+    ) -> UserStatsResponseV1:
         raise NotImplementedError
