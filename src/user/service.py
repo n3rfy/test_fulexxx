@@ -1,10 +1,15 @@
+from datetime import datetime
 from typing import List
 
 from sqlalchemy import select, insert, delete
 from sqlalchemy.future import Engine
 
 from src.database import tables
-from src.user.models import UserResponseV1, UserAddRequestV1
+from src.user.models import (
+    UserResponseV1, 
+    UserAddRequestV1,
+    UserStatsResponseV1,
+)
 
 
 class UserService:
@@ -51,3 +56,25 @@ class UserService:
         with self._engine.connect() as connection:
             connection.execute(query)
             connection.commit()
+
+    def get_user_stats_by_id(
+        self,
+        id: int,
+        date_from: datetime, 
+        date_to: datetime,
+    ) -> UserStatsResponseV1:
+        query = select(
+                    tables.users,
+                    tables.stats
+                ).where(
+                    tables.users.c.id == id
+                )
+        with self._engine.connect() as connection:
+            user_data = connection.execute(query)
+        print(user_data)
+        user = UserResponseV1(
+            id=user_data['id'],
+            login=user_data['login'],
+            name=user_data['name']
+            )
+
