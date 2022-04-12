@@ -9,3 +9,9 @@
 
 # PyTest
 .pytest_cache
+
+# .env_variables
+.env
+
+# database database
+/data
