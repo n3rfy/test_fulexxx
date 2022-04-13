@@ -1,7 +1,7 @@
-from datetime import date
+from datetime import date, datetime
 from typing import List
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, validator
 
 class UserResponseV1(BaseModel):
     id: int = Field(..., ge=1)
@@ -28,6 +28,12 @@ class StatsAddV1(BaseModel):
     forks: int 
     watchers: int 
 
+    @validator("date", pre=True)
+    def parse_birthdate(cls, value):
+        return datetime.strptime(
+            value,
+            "%Y-%m-%dT%H:%M:%SZ"
+        ).date()
 
 class UserStatsResponseV1(BaseModel):
     user: UserResponseV1
