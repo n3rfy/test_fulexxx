@@ -6,14 +6,12 @@ import aiohttp
 import sqlalchemy as sa
 from sqlalchemy import select, insert, delete, update
 from sqlalchemy.future import Engine
-from loguru import logger
 
 from src.user.models import StatsAddV1
 from src.database import tables
+from src import logger
 
 URLGIT = "https://api.github.com/users/{login}/repos"
-logger.add(sys.stderr, format="{time} {level} {message}", filter="my_module", level="INFO")
-
 
 class GitHub:
     """Class for parsing"""
@@ -41,6 +39,7 @@ class GitHub:
         if repo:
             # update repo if new stats
             if StatsAddV1(**repo[0]) == stats_r:
+                logger.info(f"repo_id({stats_r.repo_id}) is defoult)")
                 return
             query = update(tables.stats).where(
                     tables.stats.c.repo_id == stats_r.repo_id
@@ -48,12 +47,14 @@ class GitHub:
             with self._engine.connect() as connection:
                 connection.execute(query)
                 connection.commit()
+            logger.info(f"repo_id({stats_r.repo_id}) is update)")
             return     
         # else create stats
         query = insert(tables.stats).values(**stats_r.dict())
         with self._engine.connect() as connection:
             connection.execute(query)
             connection.commit()
+        logger.info(f"repo_id({stats_r.repo_id}) is add)")
 
     @staticmethod
     async def get_stats_user_by_login(id_user, login: str) -> List[StatsAddV1]:

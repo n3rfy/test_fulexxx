@@ -13,6 +13,7 @@ from src.user.models import (
     UserStatsResponseV1,
     StatsResponseV1,
 )
+from src import logger
 
 
 class UserService:

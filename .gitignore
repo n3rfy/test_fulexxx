@@ -15,3 +15,7 @@
 
 # database database
 /data
+
+# logger
+
+debug.log
