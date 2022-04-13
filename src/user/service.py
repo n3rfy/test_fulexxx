@@ -55,8 +55,8 @@ class UserService:
             connection.commit()
         github = GitHub(self._engine)
         all_stats_rep = await github.get_stats_user_by_login(
-                            id_user=UserAddRequestV1.id, 
-                            login=UserAddRequestV1.login,
+                            id_user=user.id, 
+                            login=user.login,
                         )
         for stats_rep in all_stats_rep:
             github.push_stats_users_in_database(stats_rep)

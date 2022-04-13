@@ -19,7 +19,7 @@ class UserServiceProtocol:
     def delete_user_by_id(self, id: int) -> None:
         raise NotImplementedError
 
-    def add_user(self, user: UserAddRequestV1) -> None:
+    async def add_user(self, user: UserAddRequestV1) -> None:
         raise NotImplementedError
 
     def get_stats_user_by_id(
