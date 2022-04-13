@@ -4,13 +4,16 @@ from datetime import time, datetime
 
 import aiohttp
 import sqlalchemy as sa
-from sqlalchemy import select, insert, delete
+from sqlalchemy import select, insert, delete, update
 from sqlalchemy.future import Engine
+from loguru import logger
 
 from src.user.models import StatsAddV1
 from src.database import tables
 
 URLGIT = "https://api.github.com/users/{login}/repos"
+logger.add(sys.stderr, format="{time} {level} {message}", filter="my_module", level="INFO")
+
 
 class GitHub:
     """Class for parsing"""
@@ -26,15 +29,27 @@ class GitHub:
         return { t_login[1]: t_login[0] for t_login in users_login }
     
     def push_stats_users_in_database(self, stats_r: StatsAddV1) -> None:
+        """create and update stats repo"""
+
         instance_q = select(tables.stats).where(
                     tables.stats.c.repo_id==stats_r.repo_id,
                     tables.stats.c.user_id==stats_r.user_id,
                 )
         with self._engine.connect() as connection:
-            instance = connection.execute(instance_q)
-        instance = [ i for i in instance ]
-        if instance:
-            return 
+            repo = connection.execute(instance_q)
+        repo = [r for r in repo]
+        if repo:
+            # update repo if new stats
+            if StatsAddV1(**repo[0]) == stats_r:
+                return
+            query = update(tables.stats).where(
+                    tables.stats.c.repo_id == stats_r.repo_id
+                    ).values(**stats_r.dict())
+            with self._engine.connect() as connection:
+                connection.execute(query)
+                connection.commit()
+            return     
+        # else create stats
         query = insert(tables.stats).values(**stats_r.dict())
         with self._engine.connect() as connection:
             connection.execute(query)
