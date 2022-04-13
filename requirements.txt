@@ -6,3 +6,6 @@ pydantic==1.9.0
 sqlalchemy==1.4.35
 alembic==1.7.7
 psycopg2==2.9.3
+loguru
+aiohttp
+python-dotenv
