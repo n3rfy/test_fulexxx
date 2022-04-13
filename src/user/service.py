@@ -37,10 +37,13 @@ class UserService:
         query = select(tables.users).where(tables.users.c.id == id)
         with self._engine.connect() as connection:
             user_data = connection.execute(query)
+        user = [u for u in user_data]
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
         user = UserResponseV1(
-            id=user_data['id'],
-            login=user_data['login'],
-            name=user_data['name']
+            id=user[0]['id'],
+            login=user[0]['login'],
+            name=user[0]['name']
         )
         return user
 

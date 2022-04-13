@@ -30,6 +30,10 @@ class StatsAddV1(BaseModel):
 
     @validator("date", pre=True)
     def parse_birthdate(cls, value):
+        if type(value) is datetime:
+            return value.date()
+        if type(value) is date:
+            return value
         return datetime.strptime(
             value,
             "%Y-%m-%dT%H:%M:%SZ"
