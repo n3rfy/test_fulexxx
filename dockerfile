@@ -1,4 +1,5 @@
 # pull the official docker image
+FROM ubuntu:latest
 FROM python:3.10.4-buster
 
 # set work directory
@@ -15,14 +16,15 @@ COPY requirements_test.txt .
 RUN apt-get -y update && apt-get -y upgrade
 RUN apt-get install -y cron
 RUN apt-get install gcc libc-dev g++ libffi-dev libxml2 libffi-dev unixodbc-dev -y
-RUN touch /var/log/cron.log 
 RUN pip install -r requirements.txt
 RUN pip install -r requirements_test.txt
 RUN pip install -r requirements_dev.txt
 # copy project
-COPY ./task/task /etc/cron.d/cjob
+COPY ./task/task /etc/cron.d/task
 COPY . .
 # run cron
-RUN chmod 0644 /etc/cron.d/cjob
-CMD cron -f 
+RUN chmod 0644 /etc/cron.d/task
+RUN crontab /etc/cron.d/task
+RUN touch /var/log/cron.log 
+CMD cron
 
