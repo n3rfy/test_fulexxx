@@ -1,10 +1,11 @@
-from datetime import datetime
+from datetime import date
 from typing import List
 
-from sqlalchemy import select, insert, delete
+from sqlalchemy import select, insert, delete, and_
 from sqlalchemy.future import Engine
 from fastapi import HTTPException
 
+from src.tools.github_user import GitHub
 from src.database import tables
 from src.user.models import (
     UserResponseV1, 
@@ -43,7 +44,7 @@ class UserService:
         )
         return user
 
-    def add_user(self, user: UserAddRequestV1) -> None:
+    async def add_user(self, user: UserAddRequestV1) -> None:
         query = insert(tables.users).values(
             id=user.id,
             login=user.login,
@@ -52,6 +53,14 @@ class UserService:
         with self._engine.connect() as connection:
             connection.execute(query)
             connection.commit()
+        github = GitHub(self._engine)
+        all_stats_rep = await github.get_stats_user_by_login(
+                            id_user=UserAddRequestV1.id, 
+                            login=UserAddRequestV1.login,
+                        )
+        for stats_rep in all_stats_rep:
+            github.push_stats_users_in_database(stats_rep)
+
 
     def delete_user_by_id(self, id: int) -> None:
         query = delete(tables.users).where(tables.users.c.id == id)
@@ -62,30 +71,30 @@ class UserService:
     def get_stats_user_by_id(
         self,
         id: int,
-        date_from: datetime, 
-        date_to: datetime,
+        date_from: date, 
+        date_to: date,
     ) -> UserStatsResponseV1:
+        """Geting stats about user by id"""
+
         query = select(
                     tables.users,
                     tables.stats,
                 ).select_from(
                     tables.users.join(tables.stats)
                 ).where(
-                    tables.users.c.id == id and 
-                    date_from < tables.stats.c.date < date_to
-                )
+                    and_(
+                        tables.users.c.id == id,
+                        tables.stats.c.date.between(date_from, date_to)
+                ))
         with self._engine.connect() as connection:
             user_data = connection.execute(query)
         user_data = [ dict(user) for user in user_data ]
         if not user_data:
-            raise HTTPException(status_code=404, detail="Item not found")
+            raise HTTPException(status_code=404, detail="Stats not found")
         return UserStatsResponseV1(
             user=UserResponseV1(**user_data[0]),
             stats=[ 
-                        StatsResponseV1(
-                            date = str(stats.pop('date')),
-                            **stats
-                        ) for stats in user_data 
+                        StatsResponseV1(date = str(stats.pop('date')),**stats)
+                        for stats in user_data 
                   ],
         )
-    
