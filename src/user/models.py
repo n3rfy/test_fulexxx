@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date
 from typing import List
 
 from pydantic import BaseModel, Field
@@ -23,7 +23,7 @@ class StatsResponseV1(BaseModel):
 class StatsAddV1(BaseModel):
     user_id: int
     repo_id: int
-    date: datetime 
+    date: date
     stargazers: int
     forks: int 
     watchers: int 

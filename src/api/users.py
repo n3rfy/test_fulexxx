@@ -1,5 +1,5 @@
 from typing import List
-from datetime import datetime, timedelta
+from datetime import date, timedelta, datetime
 
 from fastapi import APIRouter, status, Depends, Path
 
@@ -71,8 +71,8 @@ def delete_user(
 )
 def get_user_stats(
     id: int = Path(..., ge=1),
-    date_from: datetime = datetime.now() - timedelta(days=1),
-    date_to: datetime = datetime.now(),
+    date_from: date = (datetime.now() - timedelta(days=1)).date(),
+    date_to: date = (datetime.now()).date(),
     user_service: UserServiceProtocol = Depends(),
 ) -> UserStatsResponseV1:
     return user_service.get_stats_user_by_id(id, date_from, date_to)

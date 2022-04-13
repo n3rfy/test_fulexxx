@@ -1,5 +1,5 @@
 from typing import List
-from datetime import datetime
+from datetime import date
 
 from src.user.models import (
     UserResponseV1, 
@@ -25,7 +25,7 @@ class UserServiceProtocol:
     def get_stats_user_by_id(
             self,
             id: int,
-            date_from: datetime,
-            date_to: datetime,
+            date_from: date,
+            date_to: date,
     ) -> UserStatsResponseV1:
         raise NotImplementedError
