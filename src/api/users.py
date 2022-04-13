@@ -46,11 +46,11 @@ def get_user(
     summary='Добавить пользователя',
     description='Добавляет пользователя для отслеживания популярности репозиториев.',
 )
-def add_user(
+async def add_user(
         user_data: UserAddRequestV1,
         user_service: UserServiceProtocol = Depends()
 ):
-    user_service.add_user(user_data)
+    await user_service.add_user(user_data)
 
 
 @router.delete(
