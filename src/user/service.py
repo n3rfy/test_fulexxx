@@ -68,7 +68,9 @@ class UserService:
 
     def delete_user_by_id(self, id: int) -> None:
         query = delete(tables.users).where(tables.users.c.id == id)
+        query_ = delete(tables.stats).where(tables.stats.c.user_id == id)
         with self._engine.connect() as connection:
+            connection.execute(query_)
             connection.execute(query)
             connection.commit()
 
