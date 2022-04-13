@@ -1,0 +1,1 @@
+* * * * * root python /app/task/update_all_stats_users.py >> app/cron.log

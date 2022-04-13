@@ -12,10 +12,17 @@ ENV PYTHONUNBUFFERED 1
 COPY requirements.txt .
 COPY requirements_dev.txt .
 COPY requirements_test.txt .
-RUN apt-get update
+RUN apt-get -y update && apt-get -y upgrade
+RUN apt-get install -y cron
 RUN apt-get install gcc libc-dev g++ libffi-dev libxml2 libffi-dev unixodbc-dev -y
+RUN touch /var/log/cron.log 
 RUN pip install -r requirements.txt
 RUN pip install -r requirements_test.txt
 RUN pip install -r requirements_dev.txt
 # copy project
+COPY ./task/task /etc/cron.d/cjob
 COPY . .
+# run cron
+RUN chmod 0644 /etc/cron.d/cjob
+CMD cron -f 
+
