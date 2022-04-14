@@ -37,14 +37,13 @@ class UserService:
     def get_user_by_id(self, id: int) -> UserResponseV1:
         query = select(tables.users).where(tables.users.c.id == id)
         with self._engine.connect() as connection:
-            user_data = connection.execute(query)
-        user = [u for u in user_data]
+            user = connection.execute(query).fetchone()
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
         user = UserResponseV1(
-            id=user[0]['id'],
-            login=user[0]['login'],
-            name=user[0]['name']
+            id=user['id'],
+            login=user['login'],
+            name=user['name']
         )
         return user
 
@@ -93,14 +92,13 @@ class UserService:
                         tables.stats.c.date.between(date_from, date_to)
                 ))
         with self._engine.connect() as connection:
-            user_data = connection.execute(query)
-        user_data = [ dict(user) for user in user_data ]
-        if not user_data:
+            stats = connection.execute(query).fetchall()
+        if not stats:
             raise HTTPException(status_code=404, detail="Stats not found")
         return UserStatsResponseV1(
-            user=UserResponseV1(**user_data[0]),
+            user=UserResponseV1(**stats[0]),
             stats=[ 
-                        StatsResponseV1(date = str(stats.pop('date')),**stats)
-                        for stats in user_data 
+                        StatsResponseV1(**stat)
+                        for stat in stats
                   ],
         )

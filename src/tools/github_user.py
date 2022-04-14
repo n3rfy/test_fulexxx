@@ -34,8 +34,7 @@ class GitHub:
                     tables.stats.c.user_id==stats_r.user_id,
                 )
         with self._engine.connect() as connection:
-            repo = connection.execute(instance_q)
-        repo = [r for r in repo]
+            repo = connection.execute(instance_q).fetchall()
         if repo:
             # update repo if new stats
             if StatsAddV1(**repo[0]) == stats_r:

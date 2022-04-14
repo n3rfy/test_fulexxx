@@ -20,6 +20,12 @@ class StatsResponseV1(BaseModel):
     forks: int 
     watchers: int 
 
+    @validator("date", pre=True)
+    def parse_date(cls, value):
+        if type(value) is date:
+            return datetime.strftime(value, "%Y-%m-%d")
+        return value
+
 class StatsAddV1(BaseModel):
     user_id: int
     repo_id: int
@@ -29,7 +35,7 @@ class StatsAddV1(BaseModel):
     watchers: int 
 
     @validator("date", pre=True)
-    def parse_birthdate(cls, value):
+    def parse_date(cls, value):
         if type(value) is datetime:
             return value.date()
         if type(value) is date:
