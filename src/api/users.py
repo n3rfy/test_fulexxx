@@ -66,6 +66,7 @@ def delete_user(
 
 @router.get(
     path='/v1/users/{id}/stats',
+    response_model=UserStatsResponseV1,
     summary='Статистика пользователя за указанный период', 
     description='Статистика пользователя за указанный период',
 )
