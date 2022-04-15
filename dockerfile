@@ -14,7 +14,7 @@ COPY requirements.txt .
 COPY requirements_dev.txt .
 COPY requirements_test.txt .
 RUN apt-get -y update && apt-get -y upgrade
-RUN apt-get install -y cron
+RUN apt-get install -y cron vim
 RUN apt-get install gcc libc-dev g++ libffi-dev libxml2 libffi-dev unixodbc-dev -y
 RUN pip install -r requirements.txt
 RUN pip install -r requirements_test.txt
@@ -25,6 +25,5 @@ COPY . .
 # run cron
 RUN chmod 0644 /etc/cron.d/task
 RUN crontab /etc/cron.d/task
-RUN touch /var/log/cron.log 
+RUN touch /var/log/cron.log
 CMD cron
-

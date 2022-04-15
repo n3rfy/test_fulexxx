@@ -7,13 +7,17 @@ from fastapi import HTTPException
 
 from src.tools.github_user import GitHub
 from src.database import tables
+from src import logger
+from src.core.errors import (
+    DatabaseError,
+    NotFoundError,
+)
 from src.user.models import (
     UserResponseV1, 
     UserAddRequestV1,
     UserStatsResponseV1,
     StatsResponseV1,
 )
-from src import logger
 
 
 class UserService:
@@ -24,28 +28,25 @@ class UserService:
         query = select(tables.users)
         with self._engine.connect() as connection:
             users_data = connection.execute(query)
-        users = []
-        for user_data in users_data:
-            user = UserResponseV1(
-                id=user_data['id'],
-                login=user_data['login'],
-                name=user_data['name']
-            )
-            users.append(user)
-        return users
+        return [
+                    UserResponseV1(
+                        id=user_data['id'],
+                        login=user_data['login'],
+                        name=user_data['name']
+                    ) for user_data in users_data
+               ]
 
     def get_user_by_id(self, id: int) -> UserResponseV1:
         query = select(tables.users).where(tables.users.c.id == id)
         with self._engine.connect() as connection:
             user = connection.execute(query).fetchone()
         if not user:
-            raise HTTPException(status_code=404, detail="User not found")
-        user = UserResponseV1(
+            raise NotFoundError
+        return UserResponseV1(
             id=user['id'],
             login=user['login'],
             name=user['name']
         )
-        return user
 
     async def add_user(self, user: UserAddRequestV1) -> None:
         query = insert(tables.users).values(
@@ -53,9 +54,12 @@ class UserService:
             login=user.login,
             name=user.name
         )
-        with self._engine.connect() as connection:
-            connection.execute(query)
-            connection.commit()
+        try:
+            with self._engine.connect() as connection:
+                connection.execute(query)
+                connection.commit()
+        except:
+            raise DatabaseError
         github = GitHub(self._engine)
         all_stats_rep = await github.get_stats_user_by_login(
                             id_user=user.id, 
@@ -82,19 +86,19 @@ class UserService:
         """Geting stats about user by id"""
 
         query = select(
-                    tables.users,
-                    tables.stats,
-                ).select_from(
-                    tables.users.join(tables.stats)
-                ).where(
-                    and_(
-                        tables.users.c.id == id,
-                        tables.stats.c.date.between(date_from, date_to)
-                ))
+            tables.users,
+            tables.stats,
+        ).select_from(
+            tables.users.join(tables.stats)
+        ).where(
+            and_(
+                tables.users.c.id == id,
+                tables.stats.c.date.between(date_from, date_to)
+        ))
         with self._engine.connect() as connection:
             stats = connection.execute(query).fetchall()
         if not stats:
-            raise HTTPException(status_code=404, detail="Stats not found")
+            raise NotFoundError
         return UserStatsResponseV1(
             user=UserResponseV1(**stats[0]),
             stats=[ 

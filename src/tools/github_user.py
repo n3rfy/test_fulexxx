@@ -21,13 +21,14 @@ class GitHub:
   
     def get_all_login_users(self) -> Dict:
         """Get all github {id: login} in database"""
+
         query = select(tables.users.c.login, tables.users.c.id)
         with self._engine.connect() as connection:
             users_login = connection.execute(query)
         return { t_login[1]: t_login[0] for t_login in users_login }
     
     def push_stats_users_in_database(self, stats_r: StatsAddV1) -> None:
-        """create and update stats repo"""
+        """Create and update stats repo"""
 
         instance_q = select(tables.stats).where(
                     tables.stats.c.repo_id==stats_r.repo_id,
@@ -58,6 +59,7 @@ class GitHub:
     @staticmethod
     async def get_stats_user_by_login(id_user, login: str) -> List[StatsAddV1]:
         """Get all info about repos by user"""
+
         async with aiohttp.ClientSession() as session:
             async with session.get(URLGIT.format(login=login)) as r:
                 return [ 

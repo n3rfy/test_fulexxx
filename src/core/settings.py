@@ -11,3 +11,11 @@ class DatabaseSettings(BaseSettings):
     class Config:
         env_file = '.env'
         env_file_encoding = 'utf-8'
+
+class HostSettings(BaseSettings):
+    host: str = Field(..., env='HOST')
+    port: str = Field(..., env='PORT')
+
+    class Config:
+        env_file = '.env'
+        env_file_encoding = 'utf-8'

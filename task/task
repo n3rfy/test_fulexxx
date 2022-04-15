@@ -1,1 +1,1 @@
-0 0 */1 * * root python /app/task/update_all_stats_users.py >> /var/log/cron.log
+* * * * * root python /app/task/update_all_stats_users.py 

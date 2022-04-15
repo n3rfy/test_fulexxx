@@ -74,5 +74,5 @@ def get_user_stats(
     date_from: date = (datetime.now() - timedelta(days=1)).date(),
     date_to: date = (datetime.now()).date(),
     user_service: UserServiceProtocol = Depends(),
-) -> UserStatsResponseV1:
+):
     return user_service.get_stats_user_by_id(id, date_from, date_to)

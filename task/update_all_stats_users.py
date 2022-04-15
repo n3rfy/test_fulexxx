@@ -8,13 +8,12 @@ from src.database import DatabaseSettings, create_database_url
 from src.tools.github_user import GitHub
 from src import logger
 
-db_settings = DatabaseSettings()
 engine = sa.create_engine(
-        create_database_url(db_settings),
+        create_database_url(),
         future=True
 )
 
-async def main():
+async def update_stats_users():
     """Task update stats all users in database"""
 
     logger.info("Starting update repo!!!")
@@ -28,4 +27,4 @@ async def main():
     logger.info("Finish update repo!!!")
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    asyncio.run(update_stats_users())
