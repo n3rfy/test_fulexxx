@@ -6,7 +6,7 @@ import sqlalchemy as sa
 
 from src.database import DatabaseSettings, create_database_url
 from src.tools.github_user import GitHub
-from src import logger
+from src.core.settings import logger
 
 engine = sa.create_engine(
         create_database_url(),

@@ -1,4 +1,5 @@
 from pydantic import BaseSettings, Field
+from loguru import logger
 
 
 class DatabaseSettings(BaseSettings):
@@ -19,3 +20,5 @@ class HostSettings(BaseSettings):
     class Config:
         env_file = '.env'
         env_file_encoding = 'utf-8'
+
+logger.add("debug.log", format="{time} {level} {message}", level="INFO")

@@ -3,11 +3,9 @@ from typing import List
 
 from sqlalchemy import select, insert, delete, and_
 from sqlalchemy.future import Engine
-from fastapi import HTTPException
 
 from src.tools.github_user import GitHub
 from src.database import tables
-from src import logger
 from src.core.errors import (
     DatabaseError,
     NotFoundError,

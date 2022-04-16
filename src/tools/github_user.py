@@ -1,15 +1,12 @@
 from typing import List, Dict 
-import sys
-from datetime import time, datetime
 
 import aiohttp
-import sqlalchemy as sa
 from sqlalchemy import select, insert, delete, update
 from sqlalchemy.future import Engine
 
 from src.user.models import StatsAddV1
 from src.database import tables
-from src import logger
+from src.core.settings import logger
 
 URLGIT = "https://api.github.com/users/{login}/repos"
 
@@ -62,6 +59,9 @@ class GitHub:
 
         async with aiohttp.ClientSession() as session:
             async with session.get(URLGIT.format(login=login)) as r:
+                if r.status != 200:
+                    logger.warning("status code != 200")
+                    return []
                 return [ 
                             StatsAddV1(
                                 user_id=id_user,
@@ -71,4 +71,3 @@ class GitHub:
                                 **res,
                             ) for res in await r.json()
                        ]
-    
