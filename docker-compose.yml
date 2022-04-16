@@ -3,17 +3,17 @@ version: '3.8'
 services:
   web:
     build: .
-    command: bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; alembic upgrade head; uvicorn src.api:app --host 0.0.0.0'
+    command: bash -c 'while !</dev/tcp/db/${DB_PORT}; do sleep 1; done; alembic upgrade head; uvicorn src.api:app --host ${HOST} --reload' 
     volumes:
       - .:/app
     ports:
-      - 5001:8000
+      - ${PORT}:8000
     environment:
       - DB_HOST=db
-      - DB_PORT=5432
-      - DB_USERNAME=test
-      - DB_PASSWORD=test
-      - DB_DATABASE=fulexpro
+      - DB_PORT=${DB_PORT}
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_DATABASE=${DB_DATABASE}
     depends_on:
       - db
   db:
@@ -21,11 +21,11 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     expose:
-      - 5432
+      - ${DB_PORT}
     environment:
-      - POSTGRES_USER=test
-      - POSTGRES_PASSWORD=test
-      - POSTGRES_DB=fulexpro
+      - POSTGRES_USER=${DB_USERNAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_DATABASE}
 
 volumes:
   postgres_data:
