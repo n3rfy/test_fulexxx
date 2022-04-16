@@ -22,7 +22,7 @@ router = APIRouter(
     description='Возвращает список всех пользователей.'
 )
 def get_all_users(
-        user_service: UserServiceProtocol = Depends()
+    user_service: UserServiceProtocol = Depends()
 ):
     return user_service.get_all_users()
 
@@ -34,8 +34,8 @@ def get_all_users(
     description='Возвращает информацию о пользователе.'
 )
 def get_user(
-        id: int = Path(..., ge=1),
-        user_service: UserServiceProtocol = Depends()
+    id: int = Path(..., ge=1),
+    user_service: UserServiceProtocol = Depends()
 ):
     return user_service.get_user_by_id(id)
 
@@ -47,8 +47,8 @@ def get_user(
     description='Добавляет пользователя для отслеживания популярности репозиториев.',
 )
 async def add_user(
-        user_data: UserAddRequestV1,
-        user_service: UserServiceProtocol = Depends()
+    user_data: UserAddRequestV1,
+    user_service: UserServiceProtocol = Depends()
 ):
     await user_service.add_user(user_data)
 
@@ -59,8 +59,8 @@ async def add_user(
     description='Удаляет пользователя.'
 )
 def delete_user(
-        id: int = Path(..., ge=1),
-        user_service: UserServiceProtocol = Depends()
+    id: int = Path(..., ge=1),
+    user_service: UserServiceProtocol = Depends()
 ):
     user_service.delete_user_by_id(id)
 
